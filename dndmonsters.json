@@ -1,0 +1,23 @@
+{
+    "keyy": [
+        "health",
+        "# of dice",
+        "dice damage",
+        "guarenteed damage",
+        "Armor"
+    ],
+    "goblin": [
+        12,
+        1,
+        6,
+        2,
+        15
+    ],
+    "orc": [
+        15,
+        2,
+        4,
+        1,
+        15
+    ]
+}

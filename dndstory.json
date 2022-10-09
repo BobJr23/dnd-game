@@ -1,0 +1,76 @@
+{
+    "decision1": [
+        "You ask for the directions, and he asks if you want to take the long path or the short path. While you can get to the bottom of the mountains in 1 day with the short path, it is considerably more dangerous. However, you don't have much time since there is predicted to be an avalanche within the next weeks, so you don't have all the time in the world.",
+        [],
+        [
+            [
+                "1. Short path!",
+                "shortpath"
+            ],
+            [
+                "2. Long path!",
+                "longpath"
+            ]
+        ]
+    ],
+    "shortpath": [
+        "As you're walking towards the mountains, you see an old lady getting attacked by a pair of goblins. It's probably a waste of your time to help her, but it's the morally right thing to do",
+        [],
+        [
+            [
+                "1. Help the old lady.",
+                "helplady"
+            ],
+            [
+                "2. Ignore her and continue on the path.",
+                "ignorelady"
+            ]
+        ]
+    ],
+    "longpath": [
+        "As you're walking around the tavern, you see a man getting robbed by a pair of short muscular orcs. The man seems somewhat wealthy and the orcs don't seem too menacing. It's already getting pretty late, and you don't even have a place to stay yet, so ignoring would be the most time efficient. But maybe the man will reward you for helping him",
+        [],
+        [
+            [
+                "1. Help the man",
+                "helpman"
+            ],
+            [
+                "2. Ignore her and find a place to stay.",
+                "inn"
+            ]
+        ]
+    ],
+    "helplady": [
+        "You decide to help the poor lady, so you quickly sprint over to fight the goblins.",
+        [
+            "goblin",
+            "goblin"
+        ],
+        [
+            [
+                "1. Kindly thank the woman and be on your way towards the mountain.",
+                "ignorelady"
+            ],
+            [
+                "2. Go into her house to stay for the night.",
+                "stayhouse"
+            ]
+        ],
+        "After defeating those monsters, the old lady offers for you to stay in her house for the night to regain energy and eat up. The offer is tempting, but you also don't want to be delayed in going up the mountain."
+    ],
+    "ignorelady": [
+        "You continue on your way towards the mountain. The night is getting darker and you know that in a few hours you will have to find shelter, or camp out near the mountains. You see a local inn that doesn’t look the best, but you don’t have many other options. There is also a shop that will probably sell tents and gear for camping",
+        [],
+        [
+            [
+                "1. Go to the shop and get the camping materials",
+                "shopping"
+            ],
+            [
+                "2. Go to the local inn",
+                "inn"
+            ]
+        ]
+    ]
+}
