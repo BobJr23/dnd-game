@@ -1,10 +1,11 @@
-import random, json
+import json, random
+
 
 hit_list = []
 
 theif_state = "Sneak"
 
-
+# SPELLS
 def show_spells(issneak):
     if issneak:
         issneak = "Backstab"
@@ -18,6 +19,7 @@ def show_spells(issneak):
     }
 
 
+# WEAPONS
 weapons = {
     "club": ["1d4", 5],
     "greatclub": ["1d8", 15],
@@ -54,6 +56,7 @@ class Player:
         self.clas = clas
         self.melee = True
         self.dmg = "1d4"
+        self.weapon = "club"
         self.inv = []
         self.hp = 10
         self.gold = gold
@@ -106,17 +109,7 @@ def create_player(num):
     return player
 
 
-player1, player2, player3, player4 = (
-    create_player(1),
-    create_player(2),
-    create_player(3),
-    create_player(4),
-)
-party = Party()
-print(vars(party), "\n")
-
-
-def show_stats(lst=[player1, player2, player3, player4]):
+def show_stats(lst):
     for x in lst:
         x.get_stats()
 
@@ -202,38 +195,36 @@ def player_attack(player, monster):
     )
 
     # BASIC WEAPON ATTACK
-    match attack_num:
-        case 1:
+    if attack_num == 1:
 
-            attack_roll = roll_dice(20, 1) + (player.str - 10) // 2
-            if attack_roll >= monster.armor:
+        attack_roll = roll_dice(20, 1) + (player.str - 10) // 2
+        if attack_roll >= monster.armor:
 
-                tot_dam = basic_hit(player)
-                monster.hp -= tot_dam
-                print(f"You dealt {tot_dam} damage to the monster")
+            tot_dam = basic_hit(player)
+            monster.hp -= tot_dam
+            print(f"You dealt {tot_dam} damage to the monster")
+        else:
+            print("You missed your attack!")
+    elif attack_num == 1:
+        print("You did", attack_spells[p_class])
+        if p_class == "Warrior":
+            damage, ac = warrior_attacks(player)
+        elif p_class == "Wizard":
+            damage, ac = wizard_attacks(player)
+        elif p_class == "Cleric":
+            damage, ac = cleric_attacks(player)
+        elif p_class == "Thief":
+            damage, ac = thief_attacks(player)
+        try:
+            if ac < 0:
+                ...
+            elif ac < monster.armor:
+                print("You missed!")
             else:
-                print("You missed your attack!")
-        case 2:
-            print("You did", attack_spells[p_class])
-            match p_class:
-                case "Warrior":
-                    damage, ac = warrior_attacks(player)
-                case "Wizard":
-                    damage, ac = wizard_attacks(player)
-                case "Cleric":
-                    damage, ac = cleric_attacks(player)
-                case "Thief":
-                    damage, ac = thief_attacks(player)
-            try:
-                if ac < 0:
-                    ...
-                elif ac < monster.armor:
-                    print("You missed!")
-                else:
-                    monster.hp -= damage
-                    print(f"You dealt {damage} damage to the monster")
-            except TypeError:
-                print("d")
+                monster.hp -= damage
+                print(f"You dealt {damage} damage to the monster")
+        except TypeError:
+            print("d")
     return theif_state
 
 
@@ -241,58 +232,82 @@ def fight_monster(monsters):
 
     players = list(party.__dict__.values())
 
-    objects = monsters + players
+    objects = random.shuffle(monsters + players)
+
+    def player_attack(player):
+        z = [monster.name for monster in monsters]
+        if len(z) == 0:
+            return
+        print(f"It is {player.name}'s turn. Which monster do you want to attack?\n")
+
+        monster = monsters[int(input(z)) - 1]
+        # ATTACK!
+        player_attack(player, monster)
+        # CHECK IF DEAD
+        if monster.hp > 0:
+            print(f"the monster has {monster.hp} health left")
+        else:
+            print("The monster is dead!")
+            monsters.remove(monster)
+
+    def monster_attack(monster):
+        attacked = random.choice(list(players))
+        print(f"It is {monster.name}'s turn. They attack {attacked.name}.\n")
+
+        mons_dam = roll_dice(monster.damage, monster.num)
+        attacked.hp -= mons_dam
+        if attacked.hp > 1:
+            print(
+                f"{attacked.name} took {mons_dam} damage. They are now at {attacked.hp} hp!"
+            )
+        else:
+            print(f"{attacked.name} took {mons_dam} damage. They are now unconcious")
+            players.remove(attacked)
+
     while len(monsters) > 0:
+
         for object in objects:
             if object.__class__.__name__ == "Player":
                 player_attack(object)
             else:
                 monster_attack(object)
 
-        def player_attack(player):
-            z = [monster.name for monster in monsters]
-            if len(z) == 0:
-                return
-            print(f"It is {player.name}'s turn. Which monster do you want to attack?\n")
 
-            monster = monsters[int(input(z)) - 1]
-            # ATTACK!
-            player_attack(player, monster)
-            # CHECK IF DEAD
-            if monster.hp > 0:
-                print(f"the monster has {monster.hp} health left")
-            else:
-                print("The monster is dead!")
-                monsters.remove(monster)
-
-        def monster_attack(monster):
-            attacked = random.choice(list(players))
-            print(f"It is {monster.name}'s turn. They attack {attacked.name}.\n")
-
-            mons_dam = roll_dice(monster.damage, monster.num)
-            attacked.hp -= mons_dam
-            if attacked.hp > 1:
-                print(
-                    f"{attacked.name} took {mons_dam} damage. They are now at {attacked.hp} hp!"
-                )
-            else:
-                print(
-                    f"{attacked.name} took {mons_dam} damage. They are now unconcious"
-                )
-                players.remove(attacked)
-
-
-show_stats()
 # JSON FILE OPENING
-f = open(r"C:\Users\maand\OneDrive\CodingProjects\DND GAME\dndstory.json")
-story = json.loads(f.read())
-m = open(r"C:\Users\maand\OneDrive\CodingProjects\DND GAME\dndmonsters.json")
-monster_json = json.loads(m.read())
 
 
-def shop():
-    for key, val in weapons.items():
-        print(f"{key}: {val[0]} damage. Price is {val[1]} gold")
+def shop(person):
+    while True:
+        num = -1
+        print(f"Hello {person.name}, what would you like to buy?")
+        for key, val in weapons.items():
+            num += 1
+            print(
+                f"{num}.  {key.capitalize()}: {val[0]} damage. Price is {val[1]} gold"
+            )
+
+        try:
+            while True:
+                item = int(input(f'0-{num}  (type "exit" to cancel)'))
+                yorno = input(
+                    f"Are you sure you want to buy the {list(weapons.keys())[item]}? (y/n)"
+                )
+                if "y" in yorno:
+                    break
+                else:
+                    pass
+        except:
+            return
+        if list(weapons.values())[item][1] <= person.gold:
+            person.gold -= list(weapons.values())[item][1]
+            person.weapon = list(weapons.keys())[item]
+            print(
+                f"You have successfully bought the {list(weapons.keys())[item]}! You now have {person.gold} gold."
+            )
+        else:
+            print(
+                f"You have insufficient gold, you are {list(weapons.values())[item][1]-person.gold} gold short!"
+            )
 
 
 def tavern(completed=0):
@@ -302,22 +317,21 @@ def tavern(completed=0):
             + "You walk into a tavern, and you see 4 people. Who do you walk up to? (1. Dwarf)"
         )
     )
-    match x:
-        case 1:
-            c1 = int(
-                input(
-                    "You walk up to the dwarf, and he tells you about the goblins attacking their miners. He promises good money to get rid of them, extra if you bring one back alive.(1:Accept or 2:Decline)"
-                )
+    if x == 1:
+        c1 = int(
+            input(
+                "You walk up to the dwarf, and he tells you about the goblins attacking their miners. He promises good money to get rid of them, extra if you bring one back alive.(1:Accept or 2:Decline)"
             )
-            if c1 == 2:
-                tavern()
-            else:
-                choicee = -1
-                decision = "decision1"
-        case 2:
-            ...
-        case 3:
-            ...
+        )
+        if c1 == 2:
+            tavern()
+        else:
+            choicee = -1
+            decision = "decision1"
+    elif x == 2:
+        ...
+    elif x == 3:
+        ...
 
     def get_choice(choicee, decision):
         if len(story[decision][1]) > 0:
@@ -353,4 +367,22 @@ def tavern(completed=0):
         decision = get_choice(choicee, decision)
 
 
+f = open(r"[ath to story json")
+story = json.loads(f.read())
+m = open(r"path to monster json")
+monster_json = json.loads(m.read())
+
+player1, player2, player3, player4 = (
+    create_player(1),
+    create_player(2),
+    create_player(3),
+    create_player(4),
+)
+
+party = Party()
+squad = [x for x in list(vars(party).values())]
+print(squad, "\n")
+show_stats(squad)
+
+shop(player1)
 tavern()
