@@ -1,2 +1,2 @@
 # dnd-game
-In production... doesn't really work yet
+In production... more of an example template to build on
